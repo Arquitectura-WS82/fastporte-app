@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.navigation.Navigation
 import com.fastporte.R
+import com.fastporte.helpers.BaseURL
 import com.fastporte.network.ClientsService
 import com.fastporte.network.ContractsService
 import com.fastporte.network.GeoCodeService
@@ -207,8 +208,10 @@ class ClientRequestServiceFragment : Fragment() {
             }
 
             if (allFieldsFilled) {
+                val url = BaseURL.BASE_URL.toString() + "api/";
+
                 val retrofitU = Retrofit.Builder()
-                    .baseUrl("https://api-fastporte.azurewebsites.net/api/")
+                    .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 val retrofitC = Retrofit.Builder()

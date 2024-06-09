@@ -16,6 +16,7 @@ import android.widget.Toast
 import com.fastporte.Interface.RegisterInterface
 import com.fastporte.controller.activities.LoginActivity
 import com.fastporte.R
+import com.fastporte.helpers.BaseURL
 import com.fastporte.models.User
 import retrofit2.Call
 import retrofit2.Callback
@@ -68,8 +69,10 @@ class NewAccountFragment : Fragment() {
                 val tempInfoUser = arguments?.getSerializable("tempInfoUser") as User
                 val userTypeText = arguments?.getString("userType")
 
+                val url = BaseURL.BASE_URL.toString() + "api/";
+
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("https://api-fastporte.azurewebsites.net/api/")
+                    .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 

@@ -107,7 +107,7 @@ class ClientHomeFragment : Fragment() {
                 response: Response<List<Contract>>
             ) {
                 if (response.isSuccessful) {
-                    if (response.message() == "No Content") {
+                    if (response.code() == 204) {
                         Toast.makeText(
                             view.context,
                             "No hay contratos recientes",

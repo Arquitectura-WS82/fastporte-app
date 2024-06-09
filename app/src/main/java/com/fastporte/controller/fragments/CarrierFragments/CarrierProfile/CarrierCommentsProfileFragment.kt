@@ -60,7 +60,7 @@ class CarrierCommentsProfileFragment : Fragment() {
         request.enqueue(object : Callback<List<Comment>> {
             override fun onResponse(call: Call<List<Comment>>, response: Response<List<Comment>>) {
                 if (response.isSuccessful) {
-                    if (response.message() == "No Content") {
+                    if (response.code() == 204) {
                         Toast.makeText(view.context, "No hay comentarios", Toast.LENGTH_SHORT)
                             .show()
                     } else {

@@ -77,7 +77,7 @@ class CarrierVehicleProfileFragment : Fragment()
         request.enqueue(object : Callback<List<Vehicle>> {
             override fun onResponse(call: Call<List<Vehicle>>, response: Response<List<Vehicle>>) {
                 if (response.isSuccessful) {
-                    if (response.message() == "No Content") {
+                    if (response.code() == 204) {
                         Toast.makeText(
                             view.context,
                             "No hay vehiculos registrados",

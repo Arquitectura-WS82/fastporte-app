@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat.startActivity
 import com.fastporte.R
+import com.fastporte.helpers.BaseURL
 import com.fastporte.network.ClientsService
 import com.fastporte.network.DriversService
 import com.fastporte.helpers.SharedPreferences
@@ -63,8 +64,10 @@ class LoginActivity : AppCompatActivity() {
 //        userEmail.setText("luis@gmail.com")
 //        userPassword.setText("123456")
 
+        val url = BaseURL.BASE_URL.toString() + "api/";
+
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api-fastporte.azurewebsites.net/api/")
+            .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

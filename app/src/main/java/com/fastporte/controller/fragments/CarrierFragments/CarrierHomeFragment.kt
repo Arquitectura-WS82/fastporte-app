@@ -86,7 +86,7 @@ class CarrierHomeFragment : Fragment() {
         request2.enqueue(object : Callback<List<Driver>> {
             override fun onResponse(call: Call<List<Driver>>, response: Response<List<Driver>>) {
                 if (response.isSuccessful) {
-                    if (response.message() == "No Content") {
+                    if (response.code() == 204) {
                         Log.d("profileInformationFragment", response.body().toString())
                     } else {
                         val driverList: List<Driver> = response.body()!!
@@ -110,7 +110,7 @@ class CarrierHomeFragment : Fragment() {
                 response: Response<List<Contract>>
             ) {
                 if (response.isSuccessful) {
-                    if (response.message() == "No Content") {
+                    if (response.code() == 204) {
                         Log.d("profileInformationFragment", response.body().toString())
                     } else {
                         val contractList: List<Contract> = response.body()!!

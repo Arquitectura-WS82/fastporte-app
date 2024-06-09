@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fastporte.R
 import com.fastporte.controller.fragments.ClientFragments.RecyclerView.SearchCarrierAdapter
 import com.fastporte.controller.fragments.ClientFragments.RecyclerView.SearchCarrierListener
+import com.fastporte.helpers.BaseURL
 import com.fastporte.helpers.SharedPreferences
 import com.fastporte.models.User
 import com.fastporte.models.Vehicle
@@ -49,9 +50,10 @@ class SearchResultFragment : Fragment(), SearchCarrierListener {
         val type = sharedPreferences.getValue("type").toString()
         val size = sharedPreferences.getValue("size").toString()
 
+        val url = BaseURL.BASE_URL.toString() + "api/";
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api-fastporte.azurewebsites.net/api/")
+            .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -90,8 +92,10 @@ class SearchResultFragment : Fragment(), SearchCarrierListener {
 
 
     override fun onActionsItemClick(vehicle: Vehicle, view_: View) {
+        val url = BaseURL.BASE_URL.toString() + "api/";
+
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api-fastporte.azurewebsites.net/api/")
+            .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

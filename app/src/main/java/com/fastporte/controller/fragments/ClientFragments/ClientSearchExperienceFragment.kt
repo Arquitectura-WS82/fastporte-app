@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fastporte.R
 import com.fastporte.adapter.SearchClientExperienceAdapter
 import com.fastporte.adapter.SearchClientVehicleAdapter
+import com.fastporte.helpers.BaseURL
 import com.fastporte.models.Experience
 import com.fastporte.models.User
 import com.fastporte.network.ExperienceService
@@ -42,8 +43,10 @@ class ClientSearchExperienceFragment : Fragment() {
     }
 
     private fun loadExperience(view: View) {
+        val url = BaseURL.BASE_URL.toString() + "api/";
+
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api-fastporte.azurewebsites.net/api/")
+            .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val experienceService: ExperienceService = retrofit.create(ExperienceService::class.java)

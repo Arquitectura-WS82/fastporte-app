@@ -32,10 +32,9 @@ class SearchFragment : Fragment() {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_search, container, false)
         val items = listOf("Trunk", "Van", "Cargo Truck", "Bus", "Taxi")
-
         val autoComplete: AutoCompleteTextView = view.findViewById(R.id.auto_complete)
-
         val adapter = context?.let { VehicleAdapter<String>(it, R.layout.list_item, items) }
+        val btnMeasure = view.findViewById<Button>(R.id.btnMeasure)
 
         autoComplete.setAdapter(adapter)
 
@@ -67,6 +66,10 @@ class SearchFragment : Fragment() {
                 buttonresult.isEnabled = s.toString().isNotEmpty()
             }
         })
+
+        btnMeasure.setOnClickListener {
+            Navigation.findNavController(view).navigate(R.id.measureActivity)
+        }
 
         return view
     }

@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_searchFragment_to_searchResultFragment"
             app:destination="@id/searchResultFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_measureActivity"
+            app:destination="@id/measureActivity" />
     </fragment>
     <fragment
         android:id="@+id/searchResultFragment"
@@ -50,4 +53,9 @@
             android:id="@+id/action_clientRequestServiceFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
     </fragment>
+    <activity
+        android:id="@+id/measureActivity"
+        android:name="com.fastporte.controller.activities.MeasureActivity"
+        android:label="activity_measure"
+        tools:layout="@layout/activity_measure" />
 </navigation>

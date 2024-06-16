@@ -2,6 +2,7 @@ package com.fastporte.controller.fragments.ClientFragments.ClientHome
 
 import android.content.Context
 import android.os.Build.VERSION_CODES.P
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -66,7 +67,7 @@ class ClientHomePopularAdapter(var drivers: List<Driver>, val context: Context) 
     }
 
     override fun getItemCount(): Int {
-        return 5
+        return drivers.size
     }
 
 }

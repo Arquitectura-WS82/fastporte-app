@@ -3,6 +3,7 @@ package com.fastporte.controller.fragments.CarrierFragments.CarrierProfile.Compo
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,11 +23,13 @@ import com.fastporte.helpers.SharedPreferences
 import com.fastporte.models.User
 import com.fastporte.models.Vehicle
 import com.fastporte.network.ProfileService
+import com.google.android.material.textfield.TextInputEditText
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.DecimalFormat
 
 class AddVehicle : DialogFragment() {
     private lateinit var binding: FragmentAddVehicleBinding
@@ -72,6 +75,9 @@ class AddVehicle : DialogFragment() {
         }
 
         setupDropdowns()
+        setupDecimalInput(binding.etLength)
+        setupDecimalInput(binding.etWidth)
+        setupDecimalInput(binding.etHeight)
 
         dialog.show()
         return dialog
@@ -116,6 +122,22 @@ class AddVehicle : DialogFragment() {
         binding.etPhoto.addTextChangedListener(textWatcher)
     }
 
+    private fun setupDecimalInput(editText: TextInputEditText) {
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val text = s.toString()
+                if (text.contains(".") && text.substringAfter(".").length > 2) {
+                    editText.setText(text.substring(0, text.length - 1))
+                    editText.setSelection(editText.text?.length ?: 0)
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
     private fun handleVehicleTypeSelection(type: String) {
         when (type) {
             "Trailer", "Refrigerated Truck", "Box Truck", "Panel Van", "Container Truck" -> {
@@ -154,7 +176,6 @@ class AddVehicle : DialogFragment() {
             override fun onFailure(call: Call<Vehicle>, t: Throwable) {
                 if (isAdded && !isDetached) {
                     showToast("Failed to save vehicle", false)
-                    Toast.makeText(context, "Failed to save vehicle", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -164,7 +185,6 @@ class AddVehicle : DialogFragment() {
                         showToast("Vehicle saved successfully", true)
                     } else {
                         showToast("Failed to save vehicle", false)
-                        Toast.makeText(context, "Failed to save vehicle", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -178,18 +198,25 @@ class AddVehicle : DialogFragment() {
             val toastMessage = layout.findViewById<TextView>(R.id.toastMessage)
 
             toastMessage.text = message
+
             val backgroundColor = if (isSuccess) {
                 requireContext().getColor(R.color.accept)
             } else {
                 requireContext().getColor(R.color.decline)
             }
-            layout.setBackgroundColor(backgroundColor)
 
-            with (Toast(requireContext())) {
+            // Cambiar el color del ShapeDrawable del fondo
+            val backgroundDrawable = layout.background as? GradientDrawable
+            backgroundDrawable?.setColor(backgroundColor)
+
+            with(Toast(requireContext())) {
                 duration = Toast.LENGTH_LONG
                 view = layout
                 show()
             }
         }
     }
+
+
+
 }

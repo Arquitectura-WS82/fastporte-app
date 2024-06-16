@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -17,11 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.fastporte.R
-import com.google.ar.core.ArCoreApk
-import com.google.ar.core.Config
-import com.google.ar.core.HitResult
-import com.google.ar.core.Plane
-import com.google.ar.core.Session
+import com.google.ar.core.*
 import com.google.ar.core.exceptions.FatalException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException
@@ -42,9 +39,13 @@ class MeasureFragment : Fragment() {
     private val CAMERA_PERMISSION_CODE = 100
 
     private lateinit var tvDistance: TextView
-    private lateinit var tvDistanceTwoPoints: TextView
+    private lateinit var tvDistanceWidth: TextView
     private lateinit var tvDistanceHeight: TextView
     private lateinit var tvDistanceLength: TextView
+    private lateinit var iconWidth: ImageView
+    private lateinit var iconHeight: ImageView
+    private lateinit var iconLength: ImageView
+    private lateinit var buttonConfirm: Button
 
     private var firstPointWidth: AnchorNode? = null
     private var secondPointWidth: AnchorNode? = null
@@ -64,8 +65,7 @@ class MeasureFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_measure, container, false)
@@ -77,18 +77,39 @@ class MeasureFragment : Fragment() {
 
         arFragment = childFragmentManager.findFragmentById(R.id.arFragment) as ArFragment
         tvDistance = view.findViewById(R.id.distanceTextView)
-        tvDistanceTwoPoints = view.findViewById(R.id.tvDistanceBetweenTwoPoints)
+        tvDistanceWidth = view.findViewById(R.id.tvDistanceBetweenTwoPoints)
         tvDistanceHeight = view.findViewById(R.id.tvDistanceHeight)
         tvDistanceLength = view.findViewById(R.id.tvDistanceLength)
+        iconWidth = view.findViewById(R.id.iconWidth)
+        iconHeight = view.findViewById(R.id.iconHeight)
+        iconLength = view.findViewById(R.id.iconLength)
+        buttonConfirm = view.findViewById(R.id.buttonConfirm)
 
         val buttonWidth: Button = view.findViewById(R.id.buttonWidth)
         val buttonHeight: Button = view.findViewById(R.id.buttonHeight)
         val buttonLength: Button = view.findViewById(R.id.buttonLength)
-        val buttonConfirm: Button = view.findViewById(R.id.buttonConfirm)
 
-        buttonWidth.setOnClickListener { measuringMode = MeasuringMode.WIDTH }
-        buttonHeight.setOnClickListener { measuringMode = MeasuringMode.HEIGHT }
-        buttonLength.setOnClickListener { measuringMode = MeasuringMode.LENGTH }
+        buttonWidth.setOnClickListener {
+            measuringMode = MeasuringMode.WIDTH
+            iconWidth.visibility = View.VISIBLE
+            iconHeight.visibility = View.GONE
+            iconLength.visibility = View.GONE
+        }
+
+        buttonHeight.setOnClickListener {
+            measuringMode = MeasuringMode.HEIGHT
+            iconWidth.visibility = View.GONE
+            iconHeight.visibility = View.VISIBLE
+            iconLength.visibility = View.GONE
+        }
+
+        buttonLength.setOnClickListener {
+            measuringMode = MeasuringMode.LENGTH
+            iconWidth.visibility = View.GONE
+            iconHeight.visibility = View.GONE
+            iconLength.visibility = View.VISIBLE
+        }
+
         buttonConfirm.setOnClickListener { confirmMeasurements() }
 
         // Verificar permisos de cámara
@@ -122,26 +143,27 @@ class MeasureFragment : Fragment() {
             handleTap(hitResult)
         }
     }
+
     private fun handleTap(hitResult: HitResult) {
         when (measuringMode) {
-            MeasuringMode.WIDTH -> handleMeasurement(hitResult, ::firstPointWidth, ::secondPointWidth, tvDistanceTwoPoints, "Ancho", Color.RED)
+            MeasuringMode.WIDTH -> handleMeasurement(hitResult, ::firstPointWidth, ::secondPointWidth, tvDistanceWidth, "Ancho", Color.RED)
             MeasuringMode.HEIGHT -> handleMeasurement(hitResult, ::firstPointHeight, ::secondPointHeight, tvDistanceHeight, "Alto", Color.GREEN)
             MeasuringMode.LENGTH -> handleMeasurement(hitResult, ::firstPointLength, ::secondPointLength, tvDistanceLength, "Largo", Color.BLUE)
         }
+        updateConfirmButtonState()
     }
 
     private fun handleMeasurement(hitResult: HitResult, firstPointRef: KMutableProperty0<AnchorNode?>, secondPointRef: KMutableProperty0<AnchorNode?>, textView: TextView, label: String, color: Int) {
         if (firstPointRef.get() == null) {
             firstPointRef.set(createAnchorNode(hitResult, color))
-            Toast.makeText(requireContext(), "Primer punto de $label seleccionado", Toast.LENGTH_SHORT).show()
+            textView.visibility = View.GONE
         } else if (secondPointRef.get() == null) {
             secondPointRef.set(createAnchorNode(hitResult, color))
-            Toast.makeText(requireContext(), "Segundo punto de $label seleccionado", Toast.LENGTH_SHORT).show()
             calculateDistanceBetweenPoints(firstPointRef.get(), secondPointRef.get(), textView, label)
         } else {
             clearAnchors(firstPointRef, secondPointRef)
             firstPointRef.set(createAnchorNode(hitResult, color))
-            Toast.makeText(requireContext(), "Primer punto de $label seleccionado", Toast.LENGTH_SHORT).show()
+            textView.visibility = View.GONE
         }
     }
 
@@ -172,18 +194,30 @@ class MeasureFragment : Fragment() {
         if (first != null && second != null) {
             val distance = Vector3.subtract(first.worldPosition, second.worldPosition).length()
             requireActivity().runOnUiThread {
-                textView.text = "$label entre puntos: \n%.2f metros".format(distance)
+                textView.text = "%.2f m".format(distance)
+                textView.visibility = View.VISIBLE
             }
 
-            if(MeasuringMode.WIDTH == measuringMode) {
-                distanceWidth = distance
-            } else if(MeasuringMode.HEIGHT == measuringMode) {
-                distanceHeight = distance
-            } else if(MeasuringMode.LENGTH == measuringMode) {
-                distanceLength = distance
+            when (measuringMode) {
+                MeasuringMode.WIDTH -> {
+                    distanceWidth = distance
+                }
+                MeasuringMode.HEIGHT -> {
+                    distanceHeight = distance
+                }
+                MeasuringMode.LENGTH -> {
+                    distanceLength = distance
+                }
             }
 
+            updateConfirmButtonState()
         }
+    }
+
+    private fun updateConfirmButtonState() {
+        buttonConfirm.isEnabled = firstPointWidth != null && secondPointWidth != null &&
+                firstPointHeight != null && secondPointHeight != null &&
+                firstPointLength != null && secondPointLength != null
     }
 
     private fun confirmMeasurements() {
@@ -331,9 +365,7 @@ class MeasureFragment : Fragment() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == CAMERA_PERMISSION_CODE) {

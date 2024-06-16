@@ -14,6 +14,12 @@ class Vehicle(
     @SerializedName("photo")
     val photo: String,
     @SerializedName("driver")
-    var driver: User
+    var driver: User,
+    @SerializedName("length")
+    val length: Double?,
+    @SerializedName("width")
+    val width: Double?,
+    @SerializedName("height")
+    val height: Double?
 ) : Serializable
 

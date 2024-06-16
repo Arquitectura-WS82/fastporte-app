@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -97,21 +98,21 @@ class MeasureFragment : Fragment() {
         buttonWidth.setOnClickListener {
             measuringMode = MeasuringMode.WIDTH
             iconWidth.visibility = View.VISIBLE
-            iconHeight.visibility = View.GONE
-            iconLength.visibility = View.GONE
+            iconHeight.visibility = View.INVISIBLE
+            iconLength.visibility = View.INVISIBLE
         }
 
         buttonHeight.setOnClickListener {
             measuringMode = MeasuringMode.HEIGHT
-            iconWidth.visibility = View.GONE
+            iconWidth.visibility = View.INVISIBLE
             iconHeight.visibility = View.VISIBLE
-            iconLength.visibility = View.GONE
+            iconLength.visibility = View.INVISIBLE
         }
 
         buttonLength.setOnClickListener {
             measuringMode = MeasuringMode.LENGTH
-            iconWidth.visibility = View.GONE
-            iconHeight.visibility = View.GONE
+            iconWidth.visibility = View.INVISIBLE
+            iconHeight.visibility = View.INVISIBLE
             iconLength.visibility = View.VISIBLE
         }
 
@@ -171,14 +172,14 @@ class MeasureFragment : Fragment() {
     private fun handleMeasurement(hitResult: HitResult, firstPointRef: KMutableProperty0<AnchorNode?>, secondPointRef: KMutableProperty0<AnchorNode?>, textView: TextView, label: String, color: Int) {
         if (firstPointRef.get() == null) {
             firstPointRef.set(createAnchorNode(hitResult, color))
-            textView.visibility = View.GONE
+            textView.visibility = View.INVISIBLE
         } else if (secondPointRef.get() == null) {
             secondPointRef.set(createAnchorNode(hitResult, color))
             calculateDistanceBetweenPoints(firstPointRef.get(), secondPointRef.get(), textView, label)
         } else {
             clearAnchors(firstPointRef, secondPointRef)
             firstPointRef.set(createAnchorNode(hitResult, color))
-            textView.visibility = View.GONE
+            textView.visibility = View.INVISIBLE
         }
     }
 
@@ -408,12 +409,20 @@ class MeasureFragment : Fragment() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+        Log.d("ARCore", "ARCore session resumed")
+
+        // Mostrar las distancias guardadas y ajustar visibilidad
+        updateTextViews()
+        updateConfirmButtonState()
     }
 
     override fun onPause() {
         super.onPause()
         arFragment.arSceneView.pause()
         session?.pause()
+
+        Log.d("ARCore", "ARCore session paused")
     }
 
     override fun onDestroy() {
@@ -421,5 +430,30 @@ class MeasureFragment : Fragment() {
         arFragment.arSceneView.destroy()
         session?.close()
         session = null
+
+        Log.d("ARCore", "ARCore session destroyed")
+    }
+
+    private fun updateTextViews() {
+        if (distanceWidth > 0) {
+            tvDistanceWidth.text = "%.2f m".format(distanceWidth)
+            tvDistanceWidth.visibility = View.VISIBLE
+        } else {
+            tvDistanceWidth.visibility = View.INVISIBLE
+        }
+
+        if (distanceHeight > 0) {
+            tvDistanceHeight.text = "%.2f m".format(distanceHeight)
+            tvDistanceHeight.visibility = View.VISIBLE
+        } else {
+            tvDistanceHeight.visibility = View.INVISIBLE
+        }
+
+        if (distanceLength > 0) {
+            tvDistanceLength.text = "%.2f m".format(distanceLength)
+            tvDistanceLength.visibility = View.VISIBLE
+        } else {
+            tvDistanceLength.visibility = View.INVISIBLE
+        }
     }
 }

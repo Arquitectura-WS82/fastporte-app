@@ -23,9 +23,7 @@
         android:theme="@style/Theme.FastPorte"
         tools:replace="android:allowBackup"
         tools:targetApi="31">
-        <activity
-            android:name=".controller.activities.MeasureActivity"
-            android:exported="false" />
+
         <activity
             android:name=".controller.activities.RegisterActivity"
             android:exported="false" />

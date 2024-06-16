@@ -47,9 +47,6 @@ class SearchResultFragment : Fragment(), SearchCarrierListener {
     private fun retrofit(_view: View) {
         val _context = requireContext()
         val sharedPreferences = SharedPreferences(_context)
-        val type = sharedPreferences.getValue("type").toString()
-        val size = sharedPreferences.getValue("size").toString()
-
         val url = BaseURL.BASE_URL.toString() + "api/";
 
         val retrofit = Retrofit.Builder()
@@ -59,24 +56,54 @@ class SearchResultFragment : Fragment(), SearchCarrierListener {
 
         val vehicleService: VehicleService = retrofit.create(VehicleService::class.java)
 
-        val listVehicle = vehicleService.getVehicleFindTypeQuantity(type, size, "json")
-        listVehicle.enqueue(object : Callback<List<Vehicle>> {
-            override fun onResponse(call: Call<List<Vehicle>>, response: Response<List<Vehicle>>) {
-                val vehicleList = response.body()
-                if (vehicleList != null) {
-                    resultRecyclerView.adapter = SearchCarrierAdapter(
-                        vehicleList,
-                        requireContext(),
-                        this@SearchResultFragment
-                    )
-                    resultRecyclerView.layoutManager = LinearLayoutManager(context)
-                }
-            }
+        if (sharedPreferences.getValue("mode") == "default") {
+            val type = sharedPreferences.getValue("type").toString()
+            val size = sharedPreferences.getValue("size").toString()
 
-            override fun onFailure(call: Call<List<Vehicle>>, t: Throwable) {
-                Log.d("Search Vehicle", t.toString())
-            }
-        })
+            val listVehicle = vehicleService.getVehicleFindTypeQuantity(type, size, "json")
+            listVehicle.enqueue(object : Callback<List<Vehicle>> {
+                override fun onResponse(call: Call<List<Vehicle>>, response: Response<List<Vehicle>>) {
+                    val vehicleList = response.body()
+                    if (vehicleList != null) {
+                        resultRecyclerView.adapter = SearchCarrierAdapter(
+                            vehicleList,
+                            requireContext(),
+                            this@SearchResultFragment
+                        )
+                        resultRecyclerView.layoutManager = LinearLayoutManager(context)
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Vehicle>>, t: Throwable) {
+                    Log.d("Search Vehicle", t.toString())
+                }
+            })
+        } else if (sharedPreferences.getValue("mode") == "AR") {
+
+            val length = sharedPreferences.getValue("length").toString()
+            val width = sharedPreferences.getValue("width").toString()
+            val height = sharedPreferences.getValue("height").toString()
+            val quantity = sharedPreferences.getValue("quantity").toString()
+
+            val listVehicle = vehicleService.getVehicleFindMeasuresQuantity(length, width, height, quantity,"json")
+            listVehicle.enqueue(object : Callback<List<Vehicle>> {
+                override fun onResponse(call: Call<List<Vehicle>>, response: Response<List<Vehicle>>) {
+                    val vehicleList = response.body()
+                    if (vehicleList != null) {
+                        resultRecyclerView.adapter = SearchCarrierAdapter(
+                            vehicleList,
+                            requireContext(),
+                            this@SearchResultFragment
+                        )
+                        resultRecyclerView.layoutManager = LinearLayoutManager(context)
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Vehicle>>, t: Throwable) {
+                    Log.d("Search Vehicle", t.toString())
+                }
+            })
+        }
 
 
     }

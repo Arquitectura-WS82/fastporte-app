@@ -1,70 +1,102 @@
-package com.fastporte.controller.activities
+package com.fastporte.controller.fragments.ClientFragments
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import com.fastporte.R
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.Config
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
 import com.google.ar.core.Session
-import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.FatalException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.sceneform.AnchorNode
-import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.MaterialFactory
 import com.google.ar.sceneform.rendering.ShapeFactory
 import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
-import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.reflect.KMutableProperty0
 
-class MeasureActivity : AppCompatActivity() {
+class MeasureFragment : Fragment() {
     private lateinit var arFragment: ArFragment
     private var session: Session? = null
     private val CAMERA_PERMISSION_CODE = 100
 
     private lateinit var tvDistance: TextView
     private lateinit var tvDistanceTwoPoints: TextView
+    private lateinit var tvDistanceHeight: TextView
+    private lateinit var tvDistanceLength: TextView
 
-    private var firstPoint: AnchorNode? = null
-    private var secondPoint: AnchorNode? = null
-    private var lineNode: AnchorNode? = null
+    private var firstPointWidth: AnchorNode? = null
+    private var secondPointWidth: AnchorNode? = null
+    private var firstPointHeight: AnchorNode? = null
+    private var secondPointHeight: AnchorNode? = null
+    private var firstPointLength: AnchorNode? = null
+    private var secondPointLength: AnchorNode? = null
 
-    private var firstPointD: HitResult? = null
-    private var secondPointD: HitResult? = null
+    private var measuringMode = MeasuringMode.WIDTH
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_measure)
+    private var distanceWidth: Float = 0f
+    private var distanceHeight: Float = 0f
+    private var distanceLength: Float = 0f
 
-        arFragment = supportFragmentManager.findFragmentById(R.id.arFragment) as ArFragment
-        tvDistance = findViewById(R.id.distanceTextView)
-        tvDistanceTwoPoints = findViewById(R.id.tvDistanceBetweenTwoPoints)
+    private enum class MeasuringMode {
+        WIDTH, HEIGHT, LENGTH
+    }
 
-        //val resetButton: Button = findViewById(R.id.resetButton)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view: View = inflater.inflate(R.layout.fragment_measure, container, false)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        arFragment = childFragmentManager.findFragmentById(R.id.arFragment) as ArFragment
+        tvDistance = view.findViewById(R.id.distanceTextView)
+        tvDistanceTwoPoints = view.findViewById(R.id.tvDistanceBetweenTwoPoints)
+        tvDistanceHeight = view.findViewById(R.id.tvDistanceHeight)
+        tvDistanceLength = view.findViewById(R.id.tvDistanceLength)
+
+        val buttonWidth: Button = view.findViewById(R.id.buttonWidth)
+        val buttonHeight: Button = view.findViewById(R.id.buttonHeight)
+        val buttonLength: Button = view.findViewById(R.id.buttonLength)
+        val buttonConfirm: Button = view.findViewById(R.id.buttonConfirm)
+
+        buttonWidth.setOnClickListener { measuringMode = MeasuringMode.WIDTH }
+        buttonHeight.setOnClickListener { measuringMode = MeasuringMode.HEIGHT }
+        buttonLength.setOnClickListener { measuringMode = MeasuringMode.LENGTH }
+        buttonConfirm.setOnClickListener { confirmMeasurements() }
 
         // Verificar permisos de cámara
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                this,
+                requireActivity(),
                 arrayOf(Manifest.permission.CAMERA),
                 CAMERA_PERMISSION_CODE
             )
@@ -72,12 +104,7 @@ class MeasureActivity : AppCompatActivity() {
             checkArCoreAndSetupSession()
         }
 
-        /*resetButton.setOnClickListener {
-            resetArSession()
-        }*/
-
         arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
-
             // Obtener la posición de la cámara
             val cameraPos = arFragment.arSceneView.scene.camera.worldPosition
 
@@ -95,38 +122,35 @@ class MeasureActivity : AppCompatActivity() {
             handleTap(hitResult)
         }
     }
-
-    private fun calculateDistance(cameraPos: Vector3, hitPos: FloatArray): Float {
-        val dx = cameraPos.x - hitPos[0]
-        val dy = cameraPos.y - hitPos[1]
-        val dz = cameraPos.z - hitPos[2]
-        return Math.sqrt((dx * dx + dy * dy + dz * dz).toDouble()).toFloat()
-    }
-
     private fun handleTap(hitResult: HitResult) {
-        if (firstPoint == null) {
-            firstPoint = createAnchorNode(hitResult)
-            Toast.makeText(this, "Primer punto seleccionado", Toast.LENGTH_SHORT).show()
-        } else if (secondPoint == null) {
-            secondPoint = createAnchorNode(hitResult)
-            Toast.makeText(this, "Segundo punto seleccionado", Toast.LENGTH_SHORT).show()
-            //drawLineBetweenPoints()
-            calculateDistanceBetweenPoints()
-        } else {
-            clearAnchors()
-            firstPoint = createAnchorNode(hitResult)
-            Toast.makeText(this, "Primer punto seleccionado", Toast.LENGTH_SHORT).show()
+        when (measuringMode) {
+            MeasuringMode.WIDTH -> handleMeasurement(hitResult, ::firstPointWidth, ::secondPointWidth, tvDistanceTwoPoints, "Ancho", Color.RED)
+            MeasuringMode.HEIGHT -> handleMeasurement(hitResult, ::firstPointHeight, ::secondPointHeight, tvDistanceHeight, "Alto", Color.GREEN)
+            MeasuringMode.LENGTH -> handleMeasurement(hitResult, ::firstPointLength, ::secondPointLength, tvDistanceLength, "Largo", Color.BLUE)
         }
     }
 
-    private fun createAnchorNode(hitResult: HitResult): AnchorNode {
+    private fun handleMeasurement(hitResult: HitResult, firstPointRef: KMutableProperty0<AnchorNode?>, secondPointRef: KMutableProperty0<AnchorNode?>, textView: TextView, label: String, color: Int) {
+        if (firstPointRef.get() == null) {
+            firstPointRef.set(createAnchorNode(hitResult, color))
+            Toast.makeText(requireContext(), "Primer punto de $label seleccionado", Toast.LENGTH_SHORT).show()
+        } else if (secondPointRef.get() == null) {
+            secondPointRef.set(createAnchorNode(hitResult, color))
+            Toast.makeText(requireContext(), "Segundo punto de $label seleccionado", Toast.LENGTH_SHORT).show()
+            calculateDistanceBetweenPoints(firstPointRef.get(), secondPointRef.get(), textView, label)
+        } else {
+            clearAnchors(firstPointRef, secondPointRef)
+            firstPointRef.set(createAnchorNode(hitResult, color))
+            Toast.makeText(requireContext(), "Primer punto de $label seleccionado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun createAnchorNode(hitResult: HitResult, color: Int): AnchorNode {
         val anchor = hitResult.createAnchor()
         val anchorNode = AnchorNode(anchor)
         anchorNode.setParent(arFragment.arSceneView.scene)
 
-        MaterialFactory.makeOpaqueWithColor(this,
-            com.google.ar.sceneform.rendering.Color(Color.RED)
-        )
+        MaterialFactory.makeOpaqueWithColor(requireContext(), com.google.ar.sceneform.rendering.Color(color))
             .thenAccept { material ->
                 val sphere = ShapeFactory.makeSphere(0.02f, Vector3.zero(), material)
                 val node = TransformableNode(arFragment.transformationSystem)
@@ -137,65 +161,60 @@ class MeasureActivity : AppCompatActivity() {
         return anchorNode
     }
 
-    private fun drawLineBetweenPoints() {
-        if (firstPoint != null && secondPoint != null) {
-            val start = firstPoint!!.worldPosition
-            val end = secondPoint!!.worldPosition
-            val difference = Vector3.subtract(start, end)
-            val directionFromTopToBottom = difference.normalized()
-            val rotationFromAToB =
-                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up())
-
-            MaterialFactory.makeOpaqueWithColor(this,
-                com.google.ar.sceneform.rendering.Color(Color.BLUE)
-            )
-                .thenAccept { material ->
-                    val lineModel = ShapeFactory.makeCylinder(
-                        0.01f,
-                        difference.length(),
-                        Vector3.zero(),
-                        material
-                    )
-                    val node = AnchorNode()
-                    node.worldPosition = Vector3.add(start, end).scaled(0.5f)
-                    node.worldRotation = rotationFromAToB
-                    node.renderable = lineModel
-                    arFragment.arSceneView.scene.addChild(node)
-                    lineNode = node
-                }
+    private fun clearAnchors(vararg anchorNodes: KMutableProperty0<AnchorNode?>) {
+        anchorNodes.forEach {
+            it.get()?.anchor?.detach()
+            it.set(null)
         }
     }
 
-    private fun clearAnchors() {
-        firstPoint?.anchor?.detach()
-        secondPoint?.anchor?.detach()
-        lineNode?.let { arFragment.arSceneView.scene.removeChild(it) }
-
-        firstPoint = null
-        secondPoint = null
-        lineNode = null
-    }
-
-    private fun calculateDistanceBetweenPoints() {
-        val first = firstPoint
-        val second = secondPoint
-
+    private fun calculateDistanceBetweenPoints(first: AnchorNode?, second: AnchorNode?, textView: TextView, label: String) {
         if (first != null && second != null) {
-            val distance = sqrt(
-                ((second.worldPosition.x - first.worldPosition.x).pow(2) +
-                        (second.worldPosition.y - first.worldPosition.y).pow(2) +
-                        (second.worldPosition.z - first.worldPosition.z).pow(2)).toDouble()
-            )
-
-            runOnUiThread {
-                tvDistanceTwoPoints.text =
-                    "Distancia entre puntos: \n%.2f metros".format(distance)
+            val distance = Vector3.subtract(first.worldPosition, second.worldPosition).length()
+            requireActivity().runOnUiThread {
+                textView.text = "$label entre puntos: \n%.2f metros".format(distance)
             }
+
+            if(MeasuringMode.WIDTH == measuringMode) {
+                distanceWidth = distance
+            } else if(MeasuringMode.HEIGHT == measuringMode) {
+                distanceHeight = distance
+            } else if(MeasuringMode.LENGTH == measuringMode) {
+                distanceLength = distance
+            }
+
         }
+    }
+
+    private fun confirmMeasurements() {
+        if (firstPointWidth != null && secondPointWidth != null && firstPointHeight != null && secondPointHeight != null && firstPointLength != null && secondPointLength != null) {
+            // Obtener el contexto del activity
+            val sharedPreferences = com.fastporte.helpers.SharedPreferences(requireContext())
+            sharedPreferences.save("width", distanceWidth.toString())
+            sharedPreferences.save("height", distanceHeight.toString())
+            sharedPreferences.save("length", distanceLength.toString())
+            sharedPreferences.save("quantity", "1")
+            sharedPreferences.save("mode", "AR")
+
+            // Reemplazar el fragmento
+            Navigation.findNavController(requireView()).navigate(R.id.action_measureFragment_to_searchResultFragment)
+
+            // Confirmar medidas
+            Toast.makeText(requireContext(), "Medidas confirmadas", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(requireContext(), "Faltan medidas. Por favor, mida ancho, alto y largo.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun calculateDistance(cameraPos: Vector3, hitPos: FloatArray): Float {
+        val dx = cameraPos.x - hitPos[0]
+        val dy = cameraPos.y - hitPos[1]
+        val dz = cameraPos.z - hitPos[2]
+        return sqrt((dx * dx + dy * dy + dz * dz).toDouble()).toFloat()
     }
 
     private fun checkArCoreAndSetupSession() {
-        when (ArCoreApk.getInstance().checkAvailability(this)) {
+        when (ArCoreApk.getInstance().checkAvailability(requireContext())) {
             ArCoreApk.Availability.SUPPORTED_INSTALLED -> {
                 setupArSession()
                 arFragment.arSceneView.scene.addOnUpdateListener { frameTime ->
@@ -211,7 +230,7 @@ class MeasureActivity : AppCompatActivity() {
 
             ArCoreApk.Availability.UNSUPPORTED_DEVICE_NOT_CAPABLE -> {
                 Toast.makeText(
-                    this,
+                    requireContext(),
                     "Este dispositivo no es compatible con ARCore",
                     Toast.LENGTH_LONG
                 ).show()
@@ -219,7 +238,7 @@ class MeasureActivity : AppCompatActivity() {
 
             else -> {
                 Toast.makeText(
-                    this,
+                    requireContext(),
                     "ARCore no está disponible en este dispositivo",
                     Toast.LENGTH_LONG
                 ).show()
@@ -229,7 +248,7 @@ class MeasureActivity : AppCompatActivity() {
 
     private fun setupArSession() {
         try {
-            session = Session(this)
+            session = Session(requireContext())
             val config = Config(session)
             config.planeFindingMode = Config.PlaneFindingMode.HORIZONTAL_AND_VERTICAL
             config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
@@ -241,26 +260,26 @@ class MeasureActivity : AppCompatActivity() {
                 val updatedPlanes = frame?.getUpdatedTrackables(Plane::class.java)
 
                 updatedPlanes?.forEach { plane ->
-                    if (plane.trackingState == TrackingState.TRACKING) {
-                        when (plane.type) {
-                            Plane.Type.VERTICAL -> Log.d(
-                                "ARCore",
-                                "Plano vertical detectado durante la actualización"
-                            )
-
-                            else -> Log.d(
-                                "ARCore",
-                                "Tipo de plano desconocido durante la actualización"
-                            )
-                        }
-                    }
+//                    if (plane.trackingState == TrackingState.TRACKING) {
+//                        when (plane.type) {
+//                            Plane.Type.VERTICAL -> Log.d(
+//                                "ARCore",
+//                                "Plano vertical detectado durante la actualización"
+//                            )
+//
+//                            else -> Log.d(
+//                                "ARCore",
+//                                "Tipo de plano desconocido durante la actualización"
+//                            )
+//                        }
+//                    }
                 }
             }
 
         } catch (e: UnavailableArcoreNotInstalledException) {
             e.printStackTrace()
             Toast.makeText(
-                this,
+                requireContext(),
                 "ARCore no está instalado. Instalando ahora...",
                 Toast.LENGTH_LONG
             ).show()
@@ -268,47 +287,39 @@ class MeasureActivity : AppCompatActivity() {
         } catch (e: UnavailableDeviceNotCompatibleException) {
             e.printStackTrace()
             Toast.makeText(
-                this,
+                requireContext(),
                 "Este dispositivo no es compatible con ARCore",
                 Toast.LENGTH_LONG
             ).show()
         } catch (e: UnavailableSdkTooOldException) {
             e.printStackTrace()
             Toast.makeText(
-                this,
+                requireContext(),
                 "ARCore SDK es demasiado antiguo, actualiza la aplicación",
                 Toast.LENGTH_LONG
             ).show()
         } catch (e: UnavailableApkTooOldException) {
             e.printStackTrace()
             Toast.makeText(
-                this,
+                requireContext(),
                 "La APK de ARCore es demasiado antigua, actualiza ARCore",
                 Toast.LENGTH_LONG
             ).show()
         } catch (e: FatalException) {
             e.printStackTrace()
             Toast.makeText(
-                this,
+                requireContext(),
                 "Error fatal al inicializar ARCore: ${e.localizedMessage}",
                 Toast.LENGTH_LONG
             ).show()
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(
-                this,
+                requireContext(),
                 "Ocurrió un error inicializando ARCore: ${e.localizedMessage}",
                 Toast.LENGTH_LONG
             ).show()
         }
-    }
-
-    private fun resetArSession() {
-        arFragment.arSceneView.pause()
-        session?.close()
-        setupArSession()
-        arFragment.arSceneView.resume()
-        Toast.makeText(this, "Detección de planos reiniciada", Toast.LENGTH_SHORT).show()
     }
 
     private fun requestInstallArCore() {
@@ -332,7 +343,7 @@ class MeasureActivity : AppCompatActivity() {
             } else {
                 // Permiso denegado, mostrar mensaje al usuario
                 Toast.makeText(
-                    this,
+                    requireContext(),
                     "Permiso de cámara denegado. La aplicación no puede funcionar sin este permiso.",
                     Toast.LENGTH_LONG
                 ).show()
@@ -360,5 +371,6 @@ class MeasureActivity : AppCompatActivity() {
         super.onDestroy()
         arFragment.arSceneView.destroy()
         session?.close()
+        session = null
     }
 }

@@ -68,7 +68,7 @@ class SearchFragment : Fragment() {
         })
 
         btnMeasure.setOnClickListener {
-            Navigation.findNavController(view).navigate(R.id.measureActivity)
+            Navigation.findNavController(view).navigate(R.id.measureFragment)
         }
 
         return view
@@ -98,6 +98,7 @@ class SearchFragment : Fragment() {
         val sharedPreferences = SharedPreferences(_context)
         sharedPreferences.save("type", type_vehicle)
         sharedPreferences.save("size", Size)
+        sharedPreferences.save("mode", "default")
     }
 
     private fun next(view_: View) {

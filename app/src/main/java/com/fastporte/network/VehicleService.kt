@@ -16,4 +16,13 @@ interface VehicleService {
         @Path("quantity") quantity: String,
         @Query("format") format: String
     ): Call<List<Vehicle>>
+
+    @GET("vehicle/find/{length}/{width}/{height}/{quantity}")
+    fun getVehicleFindMeasuresQuantity(
+        @Path("length") length: String,
+        @Path("width") width: String,
+        @Path("height") height: String,
+        @Path("quantity") quantity: String,
+        @Query("format") format: String
+    ): Call<List<Vehicle>>
 }

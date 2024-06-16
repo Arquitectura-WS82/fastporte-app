@@ -14,8 +14,8 @@
             android:id="@+id/action_searchFragment_to_searchResultFragment"
             app:destination="@id/searchResultFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_measureActivity"
-            app:destination="@id/measureActivity" />
+            android:id="@+id/action_searchFragment_to_measureFragment"
+            app:destination="@id/measureFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchResultFragment"
@@ -53,9 +53,13 @@
             android:id="@+id/action_clientRequestServiceFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
     </fragment>
-    <activity
-        android:id="@+id/measureActivity"
-        android:name="com.fastporte.controller.activities.MeasureActivity"
-        android:label="activity_measure"
-        tools:layout="@layout/activity_measure" />
+    <fragment
+        android:id="@+id/measureFragment"
+        android:name="com.fastporte.controller.fragments.ClientFragments.MeasureFragment"
+        android:label="fragment_measure"
+        tools:layout="@layout/fragment_measure" >
+        <action
+            android:id="@+id/action_measureFragment_to_searchResultFragment"
+            app:destination="@id/searchResultFragment" />
+    </fragment>
 </navigation>

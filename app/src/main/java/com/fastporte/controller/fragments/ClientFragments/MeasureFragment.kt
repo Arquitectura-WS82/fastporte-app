@@ -6,10 +6,13 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -46,6 +49,7 @@ class MeasureFragment : Fragment() {
     private lateinit var iconHeight: ImageView
     private lateinit var iconLength: ImageView
     private lateinit var buttonConfirm: Button
+    private lateinit var numberOfBoxes: EditText
 
     private var firstPointWidth: AnchorNode? = null
     private var secondPointWidth: AnchorNode? = null
@@ -84,6 +88,7 @@ class MeasureFragment : Fragment() {
         iconHeight = view.findViewById(R.id.iconHeight)
         iconLength = view.findViewById(R.id.iconLength)
         buttonConfirm = view.findViewById(R.id.buttonConfirm)
+        numberOfBoxes = view.findViewById(R.id.numberOfBoxes)
 
         val buttonWidth: Button = view.findViewById(R.id.buttonWidth)
         val buttonHeight: Button = view.findViewById(R.id.buttonHeight)
@@ -111,6 +116,16 @@ class MeasureFragment : Fragment() {
         }
 
         buttonConfirm.setOnClickListener { confirmMeasurements() }
+
+        numberOfBoxes.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                updateConfirmButtonState()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         // Verificar permisos de cámara
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
@@ -215,9 +230,11 @@ class MeasureFragment : Fragment() {
     }
 
     private fun updateConfirmButtonState() {
+        val numberOfBoxesText = numberOfBoxes.text.toString()
         buttonConfirm.isEnabled = firstPointWidth != null && secondPointWidth != null &&
                 firstPointHeight != null && secondPointHeight != null &&
-                firstPointLength != null && secondPointLength != null
+                firstPointLength != null && secondPointLength != null &&
+                numberOfBoxesText.isNotEmpty() && numberOfBoxesText.toIntOrNull() != null
     }
 
     private fun confirmMeasurements() {
@@ -227,7 +244,7 @@ class MeasureFragment : Fragment() {
             sharedPreferences.save("width", distanceWidth.toString())
             sharedPreferences.save("height", distanceHeight.toString())
             sharedPreferences.save("length", distanceLength.toString())
-            sharedPreferences.save("quantity", "1")
+            sharedPreferences.save("quantity", numberOfBoxes.text.toString())
             sharedPreferences.save("mode", "AR")
 
             // Reemplazar el fragmento

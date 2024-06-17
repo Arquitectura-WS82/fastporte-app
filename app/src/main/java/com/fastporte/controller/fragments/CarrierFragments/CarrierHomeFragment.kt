@@ -159,7 +159,7 @@ class CarrierHomeFragment : Fragment() {
         val tvNameProfile = view?.findViewById<TextView>(R.id.tvNameProfile)
 
         Picasso.get().load(user.photo)
-            .error(R.drawable.ic_launcher_background)
+            .error(R.drawable.default_profile)
             .into(civUserProfile)
 
         tvNameProfile?.text = "Hi, " + user.name + "!"

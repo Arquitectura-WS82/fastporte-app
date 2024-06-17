@@ -116,7 +116,7 @@ class CarrierProfileFragment : Fragment(), EditProfileDialogListener {
 
         //Usar picasso para cargar la imagen
         Picasso.get().load(user.photo)
-            .error(R.drawable.ic_launcher_background)
+            .error(R.drawable.default_profile)
             .into(civCarrierProfile)
 
         tvCarrierName?.text = user.name

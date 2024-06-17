@@ -13,4 +13,7 @@ interface DriversService {
 
     @PUT("drivers/{id}")
     fun updateDriver(@Path("id") id: Int, @Body user: User?): Call<User>
+
+    @GET("drivers/searchEmailPassword/{email}/{password}")
+    fun searchEmailPassword(@Path("email") email: String, @Path("password") password: String): Call<User>
 }

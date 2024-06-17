@@ -14,4 +14,7 @@ interface ClientsService {
     @PUT("clients/{id}")
     fun updateClient(@Path("id") id: Int, @Body user: User?): Call<User>
 
+    @GET("clients/searchEmailPassword/{email}/{password}")
+    fun searchEmailPassword(@Path("email") email: String, @Path("password") password: String): Call<User>
+
 }

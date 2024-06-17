@@ -86,7 +86,10 @@ class ClientSearchDriverProfile : Fragment() {
 
         val picBuilder = Picasso.Builder(requireContext())
         picBuilder.downloader((OkHttp3Downloader(context)))
-        picBuilder.build().load(user.photo).placeholder(R.color.white).error(R.color.white)
+
+        picBuilder.build().load(user.photo)
+            .placeholder(R.color.white)
+            .error(R.drawable.default_profile)
             .into(civtvSearchVehicleCarrierProfile)
 
     }

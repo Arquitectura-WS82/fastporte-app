@@ -53,7 +53,7 @@ class SearchCarrierPrototype(itemView: android.view.View) : RecyclerView.ViewHol
         }
 
         Picasso.get().load(vehicle.driver.photo)
-            .error(R.mipmap.ic_launcher_round)
+            .error(R.drawable.default_profile)
             .into(Imagenperson)
     }
 

@@ -31,7 +31,8 @@ class SearchFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_search, container, false)
-        val items = listOf("Trunk", "Van", "Cargo Truck", "Bus", "Taxi")
+        //Cargo el array que tengo en values
+        val items = resources.getStringArray(R.array.vehicle_types).toList()
         val autoComplete: AutoCompleteTextView = view.findViewById(R.id.auto_complete)
         val adapter = context?.let { VehicleAdapter<String>(it, R.layout.list_item, items) }
         val btnMeasure = view.findViewById<Button>(R.id.btnMeasure)
@@ -93,11 +94,11 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun information(type_vehicle: String, Size: String) {
+    private fun information(vehicleType: String, quantity: String) {
         val _context = requireContext()
         val sharedPreferences = SharedPreferences(_context)
-        sharedPreferences.save("type", type_vehicle)
-        sharedPreferences.save("size", Size)
+        sharedPreferences.save("type", vehicleType)
+        sharedPreferences.save("size", quantity)
         sharedPreferences.save("mode", "default")
     }
 

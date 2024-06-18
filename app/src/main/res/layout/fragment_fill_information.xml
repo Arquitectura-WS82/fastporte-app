@@ -65,10 +65,9 @@
                     android:background="@drawable/edit_text_background"
                     android:drawablePadding="10dp"
                     android:ems="10"
-                    android:inputType="textPersonName"
-                    android:paddingStart="10dp"
-                    android:hint="Fullname"
-                    android:textColor="#ACACAC" />
+                    android:hint="Juan"
+                    android:inputType="text|textPersonName"
+                    android:paddingStart="10dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -88,10 +87,9 @@
                     android:background="@drawable/edit_text_background"
                     android:drawablePadding="10dp"
                     android:ems="10"
+                    android:hint="Perez"
                     android:inputType="textPersonName"
-                    android:paddingStart="10dp"
-                    android:hint="Fullname"
-                    android:textColor="#ACACAC" />
+                    android:paddingStart="10dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -111,10 +109,9 @@
                     android:background="@drawable/edit_text_background"
                     android:drawablePadding="10dp"
                     android:ems="10"
-                    android:inputType="textPersonName"
-                    android:paddingStart="10dp"
-                    android:hint="yyyy-mm-dd"
-                    android:textColor="#ACACAC" />
+                    android:hint="dd/mm/yyyy"
+                    android:inputType="datetime|date"
+                    android:paddingStart="10dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -175,10 +172,10 @@
                             android:background="@drawable/edit_text_background"
                             android:drawablePadding="10dp"
                             android:ems="10"
-                            android:inputType="textPersonName"
-                            android:paddingStart="10dp"
-                            android:hint="+51 999999999"
-                            android:textColor="#ACACAC" />
+                            android:hint="987654321"
+                            android:inputType="number|numberSigned"
+                            android:maxLength="9"
+                            android:paddingStart="10dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -289,10 +286,10 @@
                             android:background="@drawable/edit_text_background"
                             android:drawablePadding="10dp"
                             android:ems="10"
-                            android:inputType="textPersonName"
-                            android:paddingStart="10dp"
-                            android:hint="49453765"
-                            android:textColor="#ACACAC" />
+                            android:hint="87654325"
+                            android:inputType="number|numberSigned"
+                            android:maxLength="8"
+                            android:paddingStart="10dp" />
                     </LinearLayout>
                 </LinearLayout>
 

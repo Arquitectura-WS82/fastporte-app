@@ -1,212 +1,91 @@
 package com.fastporte.controller.fragments.RegisterFragments
 
-import android.app.Activity.RESULT_OK
+import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.fastporte.R
 import com.fastporte.databinding.ActivityRegisterBinding
 import com.fastporte.models.User
-
+import java.text.SimpleDateFormat
+import java.util.*
 
 class FillInformationFragment : Fragment() {
-    lateinit var user: User;
-    lateinit var userType: String;
-    lateinit var userCountry: String;
-    private var userCard = "";
-    val countries = arrayListOf(
-        "Select Country",
-        "Argentina",
-        "Bolivia",
-        "Brasil",
-        "Chile",
-        "Colombia",
-        "Costa Rica",
-        "Cuba",
-        "Ecuador",
-        "El Salvador",
-        "Guatemala",
-        "Haití",
-        "Honduras",
-        "Jamaica",
-        "México",
-        "Nicaragua",
-        "Panamá",
-        "Paraguay",
-        "Perú",
-        "Puerto Rico",
-        "República Dominicana",
-        "Uruguay",
-        "Venezuela"
-    )
-    val types = arrayListOf("Select type", "Transportista", "Cliente")
+    lateinit var user: User
+    private var userType = ""
+    private var userCard = ""
+    val types = arrayListOf("Select user type", "Transportista", "Cliente")
     val cards = arrayListOf("Select type", "DNI", "Pasaporte")
     private lateinit var mBinding: ActivityRegisterBinding
+    private lateinit var txtName: EditText
+    private lateinit var txtLastName: EditText
+    private lateinit var txtDateBirth: TextView
+    private lateinit var txtPhoneNumber: EditText
+    private lateinit var spUserType: Spinner
+    private lateinit var spIdentityCardType: Spinner
+    private lateinit var txtIdentityCardTypeNumber: EditText
+    private lateinit var btnNext2: Button
+    private val calendar = Calendar.getInstance()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_fill_information, container, false)
-        next(view)
-        spinnerCountry(view)
-        spinnerUserType(view)
-        spinnerCardType(view)
+        initializeViews(view)
+        setupTextWatchers()
+        setupSpinners()
         uploadDocument(view)
         uploadProfileId(view)
         return view
     }
 
-    private fun spinnerCountry(view_: View) {
-        val spCountry = view_.findViewById<Spinner>(R.id.spCountry)
-        mBinding = ActivityRegisterBinding.inflate(layoutInflater)
-        val adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, countries)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+    private fun initializeViews(view: View) {
+        txtName = view.findViewById(R.id.txtName)
+        txtLastName = view.findViewById(R.id.txtLastName)
+        txtDateBirth = view.findViewById(R.id.txtDateBirth)
+        txtPhoneNumber = view.findViewById(R.id.txtPhoneNumber)
+        spUserType = view.findViewById(R.id.spUserType)
+        spIdentityCardType = view.findViewById(R.id.spIdentityCardType)
+        txtIdentityCardTypeNumber = view.findViewById(R.id.txtIdentityCardTypeNumber)
+        btnNext2 = view.findViewById(R.id.btnNext2)
 
-        spCountry.adapter = adapter
-
-        spCountry.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                deleteCountryHint()
-                userCountry = parent.getItemAtPosition(position).toString()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No se ha seleccionado ninguna opción
-            }
+        txtDateBirth.setOnClickListener {
+            val today = Calendar.getInstance()
+            today.add(Calendar.YEAR, -18)
+            DatePickerDialog(
+                requireContext(),
+                { _, year, month, dayOfMonth ->
+                    val selectedDate = Calendar.getInstance()
+                    selectedDate.set(year, month, dayOfMonth)
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+                    txtDateBirth.text = dateFormat.format(selectedDate.time)
+                },
+                today.get(Calendar.YEAR),
+                today.get(Calendar.MONTH),
+                today.get(Calendar.DAY_OF_MONTH)
+            ).apply {
+                datePicker.maxDate = today.timeInMillis
+            }.show()
         }
-    }
 
-    private fun spinnerUserType(view_: View) {
-        val spUserType = view_.findViewById<Spinner>(R.id.spUserType)
-        mBinding = ActivityRegisterBinding.inflate(layoutInflater)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, types)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        spUserType.adapter = adapter
-
-        spUserType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                deleteUserHint()
-                userType = parent.getItemAtPosition(position).toString()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No se ha seleccionado ninguna opción
-            }
-        }
-    }
-
-    private fun spinnerCardType(view_: View) {
-        val spIdentityCardType = view_.findViewById<Spinner>(R.id.spIdentityCardType)
-        mBinding = ActivityRegisterBinding.inflate(layoutInflater)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, cards)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        spIdentityCardType.adapter = adapter
-
-        spIdentityCardType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                deleteCardHint()
-                userCard = parent.getItemAtPosition(position).toString()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No se ha seleccionado ninguna opción
-            }
-        }
-    }
-
-    private fun deleteCountryHint() {
-        val index = countries.indexOf("Select Country")
-        if (index != -1) {
-            countries.removeAt(index)
-        }
-    }
-
-    private fun deleteUserHint() {
-        val index = types.indexOf("Select type")
-        if (index != -1) {
-            types.removeAt(index)
-        }
-    }
-
-    private fun deleteCardHint() {
-        val index = cards.indexOf("Select type")
-        if (index != -1) {
-            cards.removeAt(index)
-        }
-    }
-
-    private fun uploadDocument(view_: View) {
-        val txtUploadPhoto = view_.findViewById<TextView>(R.id.txtUploadPhoto)
-        txtUploadPhoto.setOnClickListener() {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "image/*"
-            startActivityForResult(intent, 1)
-        }
-    }
-
-    private fun uploadProfileId(view_: View) {
-        val txtUploadDocument = view_.findViewById<TextView>(R.id.txtUploadDocument)
-        txtUploadDocument.setOnClickListener() {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "image/*"
-            startActivityForResult(intent, 1)
-        }
-    }
-
-    private fun next(view_: View) {
-        val btnNext = view_.findViewById<Button>(R.id.btnNext2)
-        val txtName = view_.findViewById<EditText>(R.id.txtName)
-        val txtLastName = view_.findViewById<EditText>(R.id.txtLastName)
-        val txtdateBirth = view_.findViewById<EditText>(R.id.txtdateBirth)
-        val txtPhoneNumber = view_.findViewById<EditText>(R.id.txtPhoneNumber)
-        //val spUserType=view_.findViewById<EditText>(R.id.spUserType)
-        //val spIdentityCardType=view_.findViewById<EditText>(R.id.spIdentityCardType)
-        val txtIdentityCardTypeNumber = view_.findViewById<EditText>(R.id.txtIdentityCardTypeNumber)
-
-        btnNext.setOnClickListener() {
-            // Imprimir cada uno de los condicionales en la consola
-            println("txtName: ${txtName.text}")
-            println("txtLastName: ${txtLastName.text}")
-            println("txtdateBirth: ${txtdateBirth.text}")
-            println("txtPhoneNumber: ${txtPhoneNumber.text}")
-            println("txtIdentityCardTypeNumber: ${txtIdentityCardTypeNumber.text}")
-            println("userCountry: $userCountry")
-            println("userCard: $userCard")
-            println("userType: $userType")
-            if (txtName.text.isEmpty() || txtLastName.text.isEmpty() || txtdateBirth.text.isEmpty() || txtPhoneNumber.text.isEmpty() || txtIdentityCardTypeNumber.text.isEmpty() || userCountry.isEmpty() || userCard.isEmpty() || userType.isEmpty()) {
-                Toast.makeText(context, "Debe rellenar todos los campos", Toast.LENGTH_SHORT).show()
-            } else {
+        btnNext2.setOnClickListener {
+            if (validateFields()) {
                 val argumentos = arguments
                 if (argumentos != null) {
                     val valor = argumentos.getStringArray("tempUser")
                     if (valor != null) {
                         user = User(
-                            txtdateBirth.text.toString(),
+                            txtDateBirth.text.toString(),
                             "",
                             valor[0].toString(),
                             0,
@@ -214,10 +93,10 @@ class FillInformationFragment : Fragment() {
                             txtLastName.text.toString(),
                             "",
                             txtPhoneNumber.text.toString(),
-                            userCountry,
+                            "Peru",
                             valor[1].toString(),
                             ""
-                        );
+                        )
                         val bundle = Bundle()
                         bundle.putSerializable("tempInfoUser", user)
                         if (userType == "Cliente") {
@@ -225,20 +104,134 @@ class FillInformationFragment : Fragment() {
                         } else {
                             bundle.putSerializable("userType", "driver")
                         }
-                        Navigation.findNavController(view_).navigate(
+                        Navigation.findNavController(view).navigate(
                             R.id.action_fillInformationFragment_to_newAccountFragment,
                             bundle
                         )
                     }
                 }
             }
+        }
+    }
 
+    private fun setupTextWatchers() {
+        val watcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                btnNext2.isEnabled = validateFields()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+
+        txtName.addTextChangedListener(watcher)
+        txtLastName.addTextChangedListener(watcher)
+        txtDateBirth.addTextChangedListener(watcher)
+        txtPhoneNumber.addTextChangedListener(watcher)
+        txtIdentityCardTypeNumber.addTextChangedListener(watcher)
+        spUserType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                btnNext2.isEnabled = validateFields()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+        spIdentityCardType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                btnNext2.isEnabled = validateFields()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun validateFields(): Boolean {
+        val name = txtName.text.toString()
+        val lastName = txtLastName.text.toString()
+        val dateBirth = txtDateBirth.text.toString()
+        val phoneNumber = txtPhoneNumber.text.toString()
+        val identityCardTypeNumber = txtIdentityCardTypeNumber.text.toString()
+
+        return name.isNotEmpty() && name.matches(Regex("^[a-zA-Z\\s]*$")) &&
+                lastName.isNotEmpty() && lastName.matches(Regex("^[a-zA-Z\\s]*$")) &&
+                dateBirth.isNotEmpty() &&
+                phoneNumber.isNotEmpty() &&
+                identityCardTypeNumber.isNotEmpty() &&
+                userType.isNotEmpty() && userCard.isNotEmpty()
+    }
+
+    private fun setupSpinners() {
+        setupSpinner(spUserType, types, "Select user type")
+        setupSpinner(spIdentityCardType, cards, "Select card type")
+    }
+
+    private fun setupSpinner(spinner: Spinner, items: List<String>, hint: String) {
+        val adapter = object : ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, items) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                if (position == 0) {
+                    (view as TextView).text = hint
+                    //view.setTextColor(resources.getColor(R.color.hint_color)) // set the hint color
+                }
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent)
+                if (position == 0) {
+                    (view as TextView).text = hint
+                    //view.setTextColor(resources.getColor(R.color.hint_color)) // set the hint color
+                } else {
+                    //(view as TextView).setTextColor(resources.getColor(R.color.default_text_color)) // set the default text color
+                }
+                return view
+            }
+
+            override fun isEnabled(position: Int): Boolean {
+                return position != 0
+            }
+        }
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+        spinner.setSelection(0, false)
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                if (position > 0) {
+                    if (spinner.id == R.id.spUserType) {
+                        userType = parent.getItemAtPosition(position).toString()
+                    } else if (spinner.id == R.id.spIdentityCardType) {
+                        userCard = parent.getItemAtPosition(position).toString()
+                    }
+                    btnNext2.isEnabled = validateFields()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun uploadDocument(view_: View) {
+//        val txtUploadPhoto = view_.findViewById<TextView>(R.id.txtUploadPhoto)
+//        txtUploadPhoto.setOnClickListener {
+//            val intent = Intent(Intent.ACTION_GET_CONTENT)
+//            intent.type = "image/*"
+//            startActivityForResult(intent, 1)
+//        }
+    }
+
+    private fun uploadProfileId(view_: View) {
+        val txtUploadDocument = view_.findViewById<TextView>(R.id.txtUploadDocument)
+        txtUploadDocument.setOnClickListener {
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.type = "image/*"
+            startActivityForResult(intent, 1)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 1 -> {
                     val selectedImageUri = data?.data
@@ -247,5 +240,4 @@ class FillInformationFragment : Fragment() {
             }
         }
     }
-
 }

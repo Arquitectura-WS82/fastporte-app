@@ -124,7 +124,6 @@
                             android:gravity="center_vertical"
                             android:hint="dd/mm/yyyy"
                             android:paddingStart="10dp"
-                            android:textColor="#ACACAC"
                             android:textSize="18sp" />
                     </LinearLayout>
 

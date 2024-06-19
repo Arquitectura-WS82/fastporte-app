@@ -32,6 +32,7 @@ class CarrierVehicleProfileFragment : Fragment()
     lateinit var vehicleRecyclerView: RecyclerView
     //var vehiclesNew = ArrayList<Vehicle>()
     //var vehicleAdapter: VehicleProfileAdapter? = null
+    lateinit var btnAddVehicle: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,8 +44,8 @@ class CarrierVehicleProfileFragment : Fragment()
         val addVehicle = AddVehicle()
         //addVehicle.setAddVehicleListener(this)
 
-        val btnAddVehicle = vehicleView.findViewById<Button>(R.id.btAddVehicle)
-        btnAddVehicle?.setOnClickListener {
+        btnAddVehicle = vehicleView.findViewById<Button>(R.id.btAddVehicle)
+        btnAddVehicle.setOnClickListener {
             addVehicle.show(parentFragmentManager, "AddVehicle")
             loadVehicles(vehicleView)
         }
@@ -83,8 +84,24 @@ class CarrierVehicleProfileFragment : Fragment()
                             "No hay vehiculos registrados",
                             Toast.LENGTH_SHORT
                         ).show()
+                        btnAddVehicle.visibility = View.VISIBLE
+                        btnAddVehicle.isEnabled = true
                     } else {
                         val vehicles: List<Vehicle> = response.body()!!
+
+                        if (vehicles.isEmpty()) {
+                            Toast.makeText(
+                                view.context,
+                                "No hay vehiculos registrados",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            btnAddVehicle.visibility = View.VISIBLE
+                            btnAddVehicle.isEnabled = true
+                        } else {
+                            btnAddVehicle.visibility = View.GONE
+                            btnAddVehicle.isEnabled = false
+                        }
+
                         //Agregar un elemento a vehicles
                         //vehiclesNew.add(Vehicle(vehiclesNew.size + 1, type/*, capacity, image*/))
                         vehicleRecyclerView.layoutManager = LinearLayoutManager(view.context)

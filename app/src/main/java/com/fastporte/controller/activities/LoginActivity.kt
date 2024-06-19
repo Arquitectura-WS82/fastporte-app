@@ -73,8 +73,8 @@ class LoginActivity : AppCompatActivity() {
                 }
                 R.id.rb_driver -> {
                     typeUser = "driver"
-                    userEmail.setText("string")
-                    userPassword.setText("string")
+                    userEmail.setText("driverprueba@gmail.com")
+                    userPassword.setText("123123")
                     Log.d("LoginActivity", typeUser)
                 }
             }
@@ -114,6 +114,8 @@ class LoginActivity : AppCompatActivity() {
                 override fun onFailure(call: Call<User>, t: Throwable) {
                     Toast.makeText(this@LoginActivity, "Error in the request", Toast.LENGTH_SHORT).show()
                     Log.d("LoginActivity Client", t.toString())
+                    Log.d("LoginActivity Client", t.message.toString())
+                    Log.d("LoginActivity Client", "URL: " + call.request().url.toString())
                 }
             })
 

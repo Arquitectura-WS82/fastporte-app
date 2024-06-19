@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.fastporte.R
 import com.fastporte.helpers.BaseURL
+import com.fastporte.helpers.General
 import com.fastporte.helpers.SharedPreferences
 import com.fastporte.models.User
 import com.fastporte.network.ProfileService
@@ -17,6 +18,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Calendar
 
 class ClientInformationProfileFragment : Fragment() {
 
@@ -41,7 +43,8 @@ class ClientInformationProfileFragment : Fragment() {
         val profileService: ProfileService = retrofit.create(ProfileService::class.java)
 
         val request = profileService.getClientProfile(
-            SharedPreferences(view.context).getValue("id")!!.toInt(), "json"
+            id = SharedPreferences(view.context).getValue("id")!!.toInt(),
+            format = "json"
         )
 
         request.enqueue(object : Callback<User> {
@@ -65,11 +68,10 @@ class ClientInformationProfileFragment : Fragment() {
         val btPhone = view?.findViewById<TextView>(R.id.btPhone)
 
         btName?.text = user.name
-        btAge?.text = user.birthdate
+        btAge?.text = General.calculateAge(user.birthdate).toString()
         btEmail?.text = user.email
         btPhone?.text = user.phone
 
     }
-
 
 }

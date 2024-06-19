@@ -166,11 +166,8 @@ class ClientRequestServiceFragment : Fragment() {
 
 
     private fun sendRequest(view_: View) {
-        val bt_client_search_request_send =
-            view_.findViewById<Button>(R.id.bt_client_search_request_send)
+        val bt_client_search_request_send = view_.findViewById<Button>(R.id.bt_client_search_request_send)
         bt_client_search_request_send.setOnClickListener(){
-            Navigation.findNavController(view_)
-                .navigate(R.id.action_clientRequestServiceFragment_to_searchFragment)
 
             val autoCompleteTextViewFrom = view_.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextViewFrom)
             val autoCompleteTextViewTo = view_.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextViewTo)
@@ -215,7 +212,7 @@ class ClientRequestServiceFragment : Fragment() {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 val retrofitC = Retrofit.Builder()
-                    .baseUrl("https://api-fastporte.azurewebsites.net/")
+                    .baseUrl(BaseURL.BASE_URL.toString())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 val contractsService: ContractsService = retrofitC.create(ContractsService::class.java)
@@ -239,46 +236,38 @@ class ClientRequestServiceFragment : Fragment() {
                                 timeArrival = setFormatTime(timeArrival),
                                 amount = editTextPrice.text.toString(),
                                 quantity = peoplePicker.text.toString(),
-                                description = editTextDescription.text.toString(),
-                                visible = true,
-                                client = client,
-                                driver = user,
-                                status = Status(0,"OFFER"),
-                                notification = Notification(0,false)
+                                description = editTextDescription.text.toString()
+//                                visible = true,
+//                                client = client,
+//                                driver = user,
+//                                status = Status(0,"OFFER"),
+//                                notification = Notification(0,false)
                             )
-                            println("subject: ${contract.subject}")
-                            println("from: ${contract.from}")
-                            println("to: ${contract.to}")
-                            println("date: ${contract.contractDate}")
-                            println("timeDeparture: ${contract.timeDeparture}")
-                            println("timeArrival: ${contract.timeArrival}")
-                            println("amount: ${contract.amount}")
-                            println("quantity: ${contract.quantity}")
-                            println("visible: ${contract.visible}")
-                            println("client: ${contract.client}")
-                            println("driver: ${contract.driver}")
-                            println("status: ${contract.status}")
-                            println("notification: ${contract.notification}")
+                            println("Contract Post: $contract")
 
                             contractsService.postContract(client.id,user.id,contract).enqueue(object :retrofit2.Callback<ContractPost>{
                                 override fun onResponse(call: Call<ContractPost>, response: Response<ContractPost>) {
                                     if(response.isSuccessful){
-                                        /*val navController = Navigation.findNavController(view_)
-                                        navController.navigate(R.id.action_clientRequestServiceFragment_to_searchFragment)*/
+                                        val navController = Navigation.findNavController(view_)
+
+                                        //Le mando el bundle con el usuario que busco
+                                        val bundle = Bundle()
+                                        bundle.putSerializable("searchUserTemp", user)
+
+                                        navController.navigate(R.id.action_clientRequestServiceFragment_to_clientSearchDriverProfile2, bundle)
                                     }else{
                                         println(response.code())
                                         println(response.body())
                                     }
-
                                 }
-
                                 override fun onFailure(call: Call<ContractPost>, t: Throwable) {
-                                    TODO("Not yet implemented")
+                                    Log.d("ClientRequestServiceFragment", t.toString())
+                                    Toast.makeText(context,"Error in the request (Failure)",Toast.LENGTH_SHORT).show()
                                 }
                             })
 
                         }else{
-                            println("--------FALSE")
+                            Toast.makeText(context,"Error in the request",Toast.LENGTH_SHORT).show()
                         }
                     }
 

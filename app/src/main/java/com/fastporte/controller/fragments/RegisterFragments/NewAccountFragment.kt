@@ -153,6 +153,10 @@ class NewAccountFragment : Fragment() {
                         }
 
                         override fun onFailure(call: Call<User>, t: Throwable) {
+                            Log.d("NewAccountFragment", t.toString())
+                            Log.d("NewAccountFragment", call.request().toString())
+                            Log.d("NewAccountFragment", call.request().body.toString())
+
                             TODO("Not yet implemented")
                         }
                     })

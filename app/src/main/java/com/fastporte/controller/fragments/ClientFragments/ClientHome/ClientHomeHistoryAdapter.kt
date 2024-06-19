@@ -46,6 +46,6 @@ class ClientHomeHistoryAdapter(var contracts: List<Contract>, val context: Conte
     }
 
     override fun getItemCount(): Int {
-        return contracts.size
+        return if (contracts.size > 5) 5 else contracts.size
     }
 }

@@ -67,7 +67,7 @@ class ClientHomePopularAdapter(var drivers: List<Driver>, val context: Context) 
     }
 
     override fun getItemCount(): Int {
-        return drivers.size
+        return if (drivers.size > 5) 5 else drivers.size
     }
 
 }

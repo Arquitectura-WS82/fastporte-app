@@ -133,11 +133,17 @@ class ContractCardPrototype(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 val request2 = contractsService.changeVisible(contract.id, "json")
                 responseService(request2)
             }
-            val btMapClient = itemView.findViewById<Button>(R.id.btMapClient)
+            /*val btMapClient = itemView.findViewById<Button>(R.id.btMapClient)
             btMapClient.setOnClickListener {
                 // Traer la información del contrato para guardarlo y redirigirlo al fragment
                 val request = contractsService.getContractsById(contract.id, "json")
                 responseServiceRedired(request,itemView)
+            }*/
+            val btFinishContract = itemView.findViewById<Button>(R.id.btMapClient)
+            btFinishContract.setOnClickListener {
+                // Cambiar estado del contrato a finished
+                val request = contractsService.updateContractStatus(contract.id, 3, "json")
+                responseService(request)
             }
 
         } else {

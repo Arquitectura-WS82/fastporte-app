@@ -5,6 +5,7 @@ import android.os.Build.VERSION_CODES.P
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.fastporte.R
 import com.fastporte.controller.fragments.CarrierFragments.CarrierHome.CarrierHomeAdapter
@@ -14,15 +15,15 @@ import com.fastporte.models.PopularDriver
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 
 class ClientHomePopularAdapter(var drivers: List<Driver>, val context: Context) :
     RecyclerView.Adapter<ClientHomePopularAdapter.ViewHolder>() {
     class ViewHolder(val view: android.view.View) : RecyclerView.ViewHolder(view) {
-        val cvPhoto =
-            view.findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.civDriverProfile)
-        val tvName = view.findViewById<android.widget.TextView>(R.id.tvDriverName)
-
+        val cvPhoto = view.findViewById<CircleImageView>(R.id.civDriverProfile)
+        val tvName = view.findViewById<TextView>(R.id.tvDriverName)
         val fabFavorite = view.findViewById<FloatingActionButton>(R.id.fabFavourite)
+        val tvType = view.findViewById<TextView>(R.id.tvClient_Popular_Type)
 
     }
 
@@ -44,6 +45,7 @@ class ClientHomePopularAdapter(var drivers: List<Driver>, val context: Context) 
 
 
         holder.tvName.text = driver.name + " " + driver.lastname
+
         val picBuilder = Picasso.Builder(context)
         picBuilder.downloader(OkHttp3Downloader(context))
         picBuilder.build()

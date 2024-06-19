@@ -53,7 +53,7 @@
         android:textSize="12sp" />
 
     <TextView
-        android:id="@+id/textView25"
+        android:id="@+id/tvClient_Popular_Type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="150dp"
@@ -62,7 +62,8 @@
         android:text="Heavy duty Truck"
         android:textAlignment="center"
         android:textColor="#000000"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/textView9"
@@ -99,7 +100,8 @@
         android:text="Type of Service:"
         android:textAlignment="center"
         android:textColor="#000000"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:visibility="gone" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabFavourite"

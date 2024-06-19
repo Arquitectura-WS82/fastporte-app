@@ -28,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
     private lateinit var radioGroup: RadioGroup
-    private var typeUser: String = ""
+    private var typeUser: String = "client"
     private lateinit var userEmail : EditText
     private lateinit var userPassword : EditText
 
@@ -73,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
                 }
                 R.id.rb_driver -> {
                     typeUser = "driver"
-                    userEmail.setText("driverprueba@gmail.com")
+                    userEmail.setText("rodalex@gmail.com")
                     userPassword.setText("123123")
                     Log.d("LoginActivity", typeUser)
                 }

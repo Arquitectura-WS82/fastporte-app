@@ -84,10 +84,19 @@ class ClientHomeFragment : Fragment() {
         request2.enqueue(object : Callback<List<Driver>> {
             override fun onResponse(call: Call<List<Driver>>, response: Response<List<Driver>>) {
                 if (response.isSuccessful) {
-                    val driverList: List<Driver> = response.body()!!
-                    popularRecyclerView.layoutManager =
-                        LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
-                    popularRecyclerView.adapter = ClientHomePopularAdapter(driverList, view.context)
+
+                    if (response.code() == 204) {
+                        Toast.makeText(
+                            view.context,
+                            "No hay conductores populares",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+
+                        val driverList: List<Driver> = response.body()!!
+                        popularRecyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+                        popularRecyclerView.adapter = ClientHomePopularAdapter(driverList, view.context)
+                    }
                 }
             }
 

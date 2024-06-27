@@ -196,10 +196,10 @@ class ClientPayContractFragment : Fragment() {
                     tilYear.isErrorEnabled = false
                 }
 
-                if ((s?.length == tilYearLength) && (s.toString().toInt() < 2023)) {
+                if ((s?.length == tilYearLength) && (s.toString().toInt() < 2024)) {
                     tilYear.error = "Invalid year"
                     tilYear.isErrorEnabled = true
-                } else if ((s?.length == tilYearLength) && (s.toString().toInt() >= 2023)) {
+                } else if ((s?.length == tilYearLength) && (s.toString().toInt() >= 2024)) {
                     tilYear.error = null
                     tilYear.isErrorEnabled = false
                 }

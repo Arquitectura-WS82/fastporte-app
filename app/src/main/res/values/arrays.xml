@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="vehicle_types">
+        <item>Trailer</item>
+        <item>Refrigerated Truck</item>
+        <item>Box Truck</item>
+        <item>Panel Van</item>
+        <item>Container Truck</item>
+        <item>Flatbed Truck</item>
+        <item>Dump Truck</item>
+    </string-array>
+
+    <string-array name="capacity_units">
+        <item>kg</item>
+    </string-array>
+</resources>

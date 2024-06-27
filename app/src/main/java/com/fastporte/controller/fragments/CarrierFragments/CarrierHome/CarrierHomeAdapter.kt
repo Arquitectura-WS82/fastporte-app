@@ -36,7 +36,7 @@ class CarrierHomeAdapter(var drivers: List<Driver>, val context: Context) :
     }
 
     override fun getItemCount(): Int {
-        return 5
+        return if (drivers.size > 5) 5 else drivers.size
     }
 
 }

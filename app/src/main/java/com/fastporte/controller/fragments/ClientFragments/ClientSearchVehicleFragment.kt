@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fastporte.R
 import com.fastporte.adapter.SearchClientCommentsAdapter
 import com.fastporte.adapter.SearchClientVehicleAdapter
+import com.fastporte.helpers.BaseURL
 import com.fastporte.models.User
 import com.fastporte.models.Vehicle
 import com.fastporte.network.CommentsService
@@ -43,8 +44,9 @@ class ClientSearchVehicleFragment : Fragment() {
     }
 
     private fun loadVehicles(view: View) {
+        val url = BaseURL.BASE_URL.toString() + "api/";
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api-fastporte.azurewebsites.net/api/")
+            .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val vehicleService: VehicleService = retrofit.create(VehicleService::class.java)

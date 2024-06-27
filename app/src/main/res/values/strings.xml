@@ -31,4 +31,12 @@
     <string name="to_tv">To:</string>
     <string name="service_tv">Service:</string>
     <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="measure">Measure</string>
+
+
+    <string name="vehicle_length">Vehicle Length (m)</string>
+    <string name="vehicle_width">Vehicle Width (m)</string>
+    <string name="vehicle_height">Vehicle Height (m)</string>
+    <string name="select_vehicle_type">Select Vehicle Type</string>
+
 </resources>

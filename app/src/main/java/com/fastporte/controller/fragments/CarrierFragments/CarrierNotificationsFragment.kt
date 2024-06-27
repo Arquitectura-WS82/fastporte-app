@@ -14,6 +14,7 @@ import com.fastporte.adapter.CarrierNotificationFinishAdapter
 import com.fastporte.adapter.CarrierNotificationRequestAdapter
 import com.fastporte.adapter.ClientNotificationsAdapter
 import com.fastporte.adapter.ClientNotificationsDenniedAdapter
+import com.fastporte.helpers.BaseURL
 import com.fastporte.helpers.SharedPreferences
 import com.fastporte.models.ClientNotification
 import com.fastporte.models.DriverNotification
@@ -40,8 +41,10 @@ class CarrierNotificationsFragment : Fragment(),
     }
 
     private fun loadNotifications(view_: View) {
+        val url = BaseURL.BASE_URL.toString() + "api/";
+
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api-fastporte.azurewebsites.net/api/")
+            .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val service = retrofit.create(NotificationService::class.java)

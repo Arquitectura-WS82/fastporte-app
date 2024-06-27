@@ -6,20 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".controller.activities.LoginActivity">
 
-    <TextView
-        android:id="@+id/tvCreate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/poppins_medium"
-        android:text="@string/create"
-        android:textAllCaps="false"
-        android:textColor="#60A3F0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.519"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvCreateAccount" />
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="80dp"
@@ -33,15 +19,16 @@
 
     <include
         layout="@layout/pre_toolbar"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="327dp"
         android:layout_height="104dp"
         android:fontFamily="@font/poppins_medium"
+        android:gravity="center_vertical"
         android:text="Welcome, Let's Get Started!"
         android:textAlignment="center"
         android:textColor=" #093649"
@@ -52,12 +39,38 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.31" />
 
+    <!-- Radio group para elegir si iniciar sesión como driver o client -->
+    <RadioGroup
+        android:id="@+id/rgTypeOfUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:checkedButton="@id/rb_client"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+        <RadioButton
+            android:id="@+id/rb_client"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Client"
+            android:textColor="#000000" />
+        <RadioButton
+            android:id="@+id/rb_driver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Driver"
+            android:textColor="#000000" />
+
+    </RadioGroup>
+
     <EditText
         android:id="@+id/et_password"
         android:layout_width="0dp"
         android:layout_height="38dp"
         android:layout_marginStart="60dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="44dp"
         android:layout_marginEnd="60dp"
         android:background="@drawable/edit_text_background"
         android:drawableStart="@drawable/baseline_lock_24"
@@ -72,13 +85,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_username" />
 
-
     <EditText
         android:id="@+id/et_username"
         android:layout_width="0dp"
         android:layout_height="38dp"
         android:layout_marginStart="60dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="44dp"
         android:layout_marginEnd="60dp"
         android:background="@drawable/edit_text_background"
         android:drawableStart="@drawable/baseline_person_24"
@@ -91,7 +103,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/rgTypeOfUser" />
 
     <TextView
         android:id="@+id/textView4"
@@ -128,13 +140,14 @@
         android:layout_marginEnd="60dp"
         android:text="Login"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_password" />
 
     <TextView
         android:id="@+id/tvpassword"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/poppins_medium"
         android:text="@string/password"
@@ -144,14 +157,29 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_login" />
 
     <TextView
+        android:id="@+id/tvCreate"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="@string/create"
+        android:textAllCaps="false"
+        android:textColor="#60A3F0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvCreateAccount"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
         android:id="@+id/tvCreateAccount"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/poppins_medium"
         android:text="No account yet?"
         android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvpassword" />
 

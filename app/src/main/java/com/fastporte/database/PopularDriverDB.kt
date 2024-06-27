@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.fastporte.models.Driver
 
-@Database(entities=[Driver::class], version=1)
+@Database(entities=[Driver::class], version=1, exportSchema = false)
 abstract class PopularDriverDB : RoomDatabase() {
     abstract fun getPopularDriverDAO():PopularDriverDao
     companion object {

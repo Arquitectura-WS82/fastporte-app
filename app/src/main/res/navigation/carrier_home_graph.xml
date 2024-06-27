@@ -23,7 +23,11 @@
         android:id="@+id/id_carrier_profile_fragment"
         android:name="com.fastporte.controller.fragments.CarrierFragments.CarrierProfileFragment"
         android:label="My profile"
-        tools:layout="@layout/fragment_carrier_profile" />
+        tools:layout="@layout/fragment_carrier_profile" >
+        <action
+            android:id="@+id/action_id_carrier_profile_fragment_to_id_carrier_home_fragment"
+            app:destination="@id/id_carrier_home_fragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/id_carrier_contracts_fragment"

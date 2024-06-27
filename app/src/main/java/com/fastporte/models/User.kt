@@ -16,4 +16,8 @@ class User(
     @SerializedName("region") var region: String,
     @SerializedName("password") var password: String,
     @SerializedName("photo") var photo: String
-) : Serializable
+) : Serializable {
+    override fun toString(): String {
+        return "User(birthdate='$birthdate', description='$description', email='$email', id=$id, name='$name', lastname='$lastname', username='$username', phone='$phone', region='$region', password='$password', photo='$photo')"
+    }
+}

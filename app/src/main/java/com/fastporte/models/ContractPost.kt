@@ -13,9 +13,15 @@ class ContractPost (
     @SerializedName("amount") val amount: String,
     @SerializedName("quantity") val quantity: String,
     @SerializedName("description") val description: String,
-    @SerializedName("visible") val visible: Boolean,
-    @SerializedName("client") val client: User,
-    @SerializedName("driver") val driver: User,
-    @SerializedName("status") val status: Status,
-    @SerializedName("notification") val notification: Notification
-): Serializable
+//    @SerializedName("visible") val visible: Boolean,
+//    @SerializedName("client") val client: User,
+//    @SerializedName("driver") val driver: User,
+//    @SerializedName("status") val status: Status,
+//    @SerializedName("notification") val notification: Notification
+
+): Serializable {
+    override fun toString(): String {
+        return "ContractPost(subject='$subject', from='$from', to='$to', contractDate='$contractDate', timeDeparture='$timeDeparture', timeArrival='$timeArrival', amount='$amount', quantity='$quantity', description='$description')"
+
+    }
+}

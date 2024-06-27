@@ -84,10 +84,19 @@ class ClientHomeFragment : Fragment() {
         request2.enqueue(object : Callback<List<Driver>> {
             override fun onResponse(call: Call<List<Driver>>, response: Response<List<Driver>>) {
                 if (response.isSuccessful) {
-                    val driverList: List<Driver> = response.body()!!
-                    popularRecyclerView.layoutManager =
-                        LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
-                    popularRecyclerView.adapter = ClientHomePopularAdapter(driverList, view.context)
+
+                    if (response.code() == 204) {
+                        Toast.makeText(
+                            view.context,
+                            "No hay conductores populares",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+
+                        val driverList: List<Driver> = response.body()!!
+                        popularRecyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+                        popularRecyclerView.adapter = ClientHomePopularAdapter(driverList, view.context)
+                    }
                 }
             }
 
@@ -107,7 +116,7 @@ class ClientHomeFragment : Fragment() {
                 response: Response<List<Contract>>
             ) {
                 if (response.isSuccessful) {
-                    if (response.message() == "No Content") {
+                    if (response.code() == 204) {
                         Toast.makeText(
                             view.context,
                             "No hay contratos recientes",
@@ -163,7 +172,7 @@ class ClientHomeFragment : Fragment() {
         val tvNameProfile = view?.findViewById<TextView>(R.id.tvNameProfile)
 
         Picasso.get().load(user.photo)
-            .error(R.drawable.ic_launcher_background)
+            .error(R.drawable.default_profile)
             .into(civUserProfile)
 
         tvNameProfile?.text = "Hi, " + user.name + "!"

@@ -14,16 +14,27 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.navigation.Navigation
 import androidx.viewpager.widget.ViewPager
 import com.fastporte.R
+import com.fastporte.helpers.BaseURL
 import com.fastporte.models.User
+import com.fastporte.network.ProfileService
 import com.google.android.material.tabs.TabLayout
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class ClientSearchDriverProfile : Fragment() {
     lateinit var user: User;
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(BaseURL.BASE_URL.toString())
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val profileService: ProfileService = retrofit.create(ProfileService::class.java)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +44,28 @@ class ClientSearchDriverProfile : Fragment() {
         val view: View =
             inflater.inflate(R.layout.fragment_client_search_driver_profile, container, false)
 
-        loadInformation(view)
+        user = arguments?.getSerializable("searchUserTemp") as User
+
+        val request = profileService.getDriverRating(user.id, "json")
+
+        request.enqueue(object : retrofit2.Callback<Float> {
+            var rating: Float = 0.0f
+            override fun onFailure(call: retrofit2.Call<Float>, t: Throwable) {
+                //Log.d("Activity Fail", "Error: $t")
+                loadInformation(view, rating)
+            }
+
+            override fun onResponse(
+                call: retrofit2.Call<Float>,
+                response: retrofit2.Response<Float>
+            ) {
+                if (response.isSuccessful) {
+                    rating = response.body()!!
+                    loadInformation(view, rating)
+                }
+            }
+        })
+
         contractDriver(view)
 
         tabLayout = view.findViewById(R.id.tab_layout)
@@ -72,21 +104,22 @@ class ClientSearchDriverProfile : Fragment() {
         }
     }
 
-    private fun loadInformation(view_: View) {
-        val tvSearchVehicleProfileName =
-            view_.findViewById<TextView>(R.id.tvSearchVehicleProfileName)
-        val tvSearchVehicleProfileDescription =
-            view_.findViewById<TextView>(R.id.tvSearchVehicleProfileDescription)
+    private fun loadInformation(view_: View, rating: Float) {
+        val tvSearchVehicleProfileName =  view_.findViewById<TextView>(R.id.tvSearchVehicleProfileName)
+        val tvSearchVehicleProfileDescription = view_.findViewById<TextView>(R.id.tvSearchVehicleProfileDescription)
         val rbSearchVehicleUserStar = view_.findViewById<RatingBar>(R.id.rbSearchVehicleUserStar)
-        val civtvSearchVehicleCarrierProfile =
-            view_.findViewById<CircleImageView>(R.id.civtvSearchVehicleCarrierProfile)
-        user = arguments?.getSerializable("searchUserTemp") as User
+        val civtvSearchVehicleCarrierProfile = view_.findViewById<CircleImageView>(R.id.civtvSearchVehicleCarrierProfile)
+
         tvSearchVehicleProfileName.text = user.name
         tvSearchVehicleProfileDescription.text = user.description
+        rbSearchVehicleUserStar.rating = rating
 
         val picBuilder = Picasso.Builder(requireContext())
         picBuilder.downloader((OkHttp3Downloader(context)))
-        picBuilder.build().load(user.photo).placeholder(R.color.white).error(R.color.white)
+
+        picBuilder.build().load(user.photo)
+            .placeholder(R.color.white)
+            .error(R.drawable.default_profile)
             .into(civtvSearchVehicleCarrierProfile)
 
     }

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.viewpager2.widget.ViewPager2
 import com.fastporte.Interface.EditProfileDialogListener
@@ -29,6 +30,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 class CarrierProfileFragment : Fragment(), EditProfileDialogListener {
 
     var tabTitle = arrayOf("Personal information", "Experience", "Vehicle", "Comments")
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(BaseURL.BASE_URL.toString())
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val profileService: ProfileService = retrofit.create(ProfileService::class.java)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,16 +92,9 @@ class CarrierProfileFragment : Fragment(), EditProfileDialogListener {
     }
 
     private fun loadData(view: View) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BaseURL.BASE_URL.toString())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
 
-        val profileService: ProfileService = retrofit.create(ProfileService::class.java)
-
-        val request = profileService.getDriverProfile(
-            SharedPreferences(view.context).getValue("id")!!.toInt(), "json"
-        )
+        val driverId = SharedPreferences(view.context).getValue("id")!!.toInt()
+        val request = profileService.getDriverProfile(driverId, "json")
 
         request.enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>, t: Throwable) {
@@ -102,25 +103,48 @@ class CarrierProfileFragment : Fragment(), EditProfileDialogListener {
 
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.isSuccessful) {
-                    showData(response.body()!!)
+                    getDriverRating(response.body()!!)
                 }
             }
         })
     }
 
-    private fun showData(user: User) {
+    private fun getDriverRating(user: User) {
+        val driverId = SharedPreferences(requireView().context).getValue("id")!!.toInt()
+        val request = profileService.getDriverRating(driverId, "json")
+        var rating = 0.0f
+
+        request.enqueue(object : Callback<Float> {
+            override fun onFailure(call: Call<Float>, t: Throwable) {
+                Log.d("profileInformationFragment", t.toString())
+                showData(user, rating)
+            }
+
+            override fun onResponse(call: Call<Float>, response: Response<Float>) {
+                if (response.isSuccessful) {
+                    rating = response.body()!!
+                    showData(user, rating)
+                }
+            }
+        })
+    }
+
+    private fun showData(user: User, rating: Float) {
 
         val civCarrierProfile = view?.findViewById<CircleImageView>(R.id.civDriverProfile)
         val tvCarrierName = view?.findViewById<TextView>(R.id.tvProfileName)
         val tvCarrierDescription = view?.findViewById<TextView>(R.id.tvProfileDescription)
+        val rbDriverRating = view?.findViewById<RatingBar>(R.id.rbDriverRatingProfile)
 
         //Usar picasso para cargar la imagen
         Picasso.get().load(user.photo)
-            .error(R.drawable.ic_launcher_background)
+            .error(R.drawable.default_profile)
             .into(civCarrierProfile)
 
         tvCarrierName?.text = user.name
         tvCarrierDescription?.text = user.description
+        rbDriverRating?.rating = rating
+        Log.d("Rating", rating.toString())
     }
 
     override fun onDialogDataSaved(user: User) {

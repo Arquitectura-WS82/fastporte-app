@@ -17,6 +17,9 @@ interface ProfileService {
     @GET("api/drivers/{id}")
     fun getDriverProfile(@Path("id") id: Int, @Query("format") format: String): Call<User>
 
+    @GET("api/drivers/rating/{id}")
+    fun getDriverRating(@Path("id") id: Int, @Query("format") format: String): Call<Float>
+
     @GET("api/experience/{id}")
     fun getDriverExperience(
         @Path("id") id: Int,

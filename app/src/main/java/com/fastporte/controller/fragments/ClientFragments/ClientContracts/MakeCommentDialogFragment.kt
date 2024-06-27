@@ -33,7 +33,7 @@ class MakeCommentDialogFragment(val contract: Contract) : DialogFragment() {
         val builder = androidx.appcompat.app.AlertDialog.Builder(requireActivity())
         builder.setView(binding.root)
 
-        builder.setPositiveButton("Update") { _, _ ->
+        builder.setPositiveButton("Publish") { _, _ ->
             val myComment = binding.tilComment.editText?.text.toString()
             val stars = binding.rbStars.rating.toString()
             val numStars = stars.toFloat()
